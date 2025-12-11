@@ -1,16 +1,11 @@
 class Article:
     all = []
     def __init__(self, author, magazine, title):
-        if isinstance(title, str):
-            if len(title) >= 5:
-                if len(title) <= 50:
-                    self._title = title
-                else:
-                    self._title = None
-            else:
-                self._title = None
-        else:
-            self._title = None
+        if not isinstance(title, str):
+            raise Exception("Title must be a string")
+        if len(title) < 5 or len(title) > 50:
+            raise Exception("Title must be between 5 and 50 characters")
+        self._title = title
         self.author = author
         self.magazine = magazine
         Article.all.append(self)
@@ -26,13 +21,11 @@ class Article:
 
 class Author:
     def __init__(self, name):
-        if isinstance(name, str):
-            if len(name) > 0:
-                self._name = name
-            else:
-                self._name = None
-        else:
-            self._name = None
+        if not isinstance(name, str):
+            raise Exception("Name must be a string")
+        if len(name) == 0:
+            raise Exception("Name must be longer than 0 characters")
+        self._name = name
 
     @property
     def name(self):
@@ -77,24 +70,19 @@ class Author:
 
 
 class Magazine:
+    all = []
     def __init__(self, name, category):
-        if isinstance(name, str):
-            if len(name) >= 2:
-                if len(name) <= 16:
-                    self._name = name
-                else:
-                    self._name = None
-            else:
-                self._name = None
-        else:
-            self._name = None
-        if isinstance(category, str):
-            if len(category) > 0:
-                self._category = category
-            else:
-                self._category = None
-        else:
-            self._category = None
+        if not isinstance(name, str):
+            raise Exception("Name must be a string")
+        if len(name) < 2 or len(name) > 16:
+            raise Exception("Name must be between 2 and 16 characters")
+        if not isinstance(category, str):
+            raise Exception("Category must be a string")
+        if len(category) == 0:
+            raise Exception("Category must be longer than 0 characters")
+        self._name = name
+        self._category = category
+        Magazine.all.append(self)
 
     @property
     def name(self):
@@ -102,9 +90,11 @@ class Magazine:
 
     @name.setter
     def name(self, value):
-        if isinstance(value, str):
-            if len(value) >= 2 and len(value) <= 16:
-                self._name = value
+        if not isinstance(value, str):
+            raise Exception("Name must be a string")
+        if len(value) < 2 or len(value) > 16:
+            raise Exception("Name must be between 2 and 16 characters")
+        self._name = value
 
     @property
     def category(self):
@@ -112,9 +102,11 @@ class Magazine:
 
     @category.setter
     def category(self, value):
-        if isinstance(value, str):
-            if len(value) > 0:
-                self._category = value
+        if not isinstance(value, str):
+            raise Exception("Category must be a string")
+        if len(value) == 0:
+            raise Exception("Category must be longer than 0 characters")
+        self._category = value
 
     def articles(self):
         res = []
@@ -156,3 +148,18 @@ class Magazine:
         if len(res) > 0:
             return res
         return None
+
+    @classmethod
+    def top_publisher(cls):
+        if not Article.all:
+            return None
+        counts = {}
+        for article in Article.all:
+            if article.magazine:
+                if article.magazine in counts:
+                    counts[article.magazine] += 1
+                else:
+                    counts[article.magazine] = 1
+        if not counts:
+            return None
+        return max(counts, key=counts.get)
